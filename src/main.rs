@@ -22,7 +22,6 @@ fn main() {
 
         // 将packet序列化
         let packet = packet.pack().unwrap();
-        println!("packet: {:?}", packet);
 
         let t = Task::unpack(&packet[get_header_size()..]).unwrap();
         println!("{:?}", t);
@@ -39,12 +38,7 @@ fn main() {
         // 发送
         stream.write(&packet).unwrap();
         stream.flush().unwrap();
-    }
 
-    // // 发送数据
-    // stream.write(b"hello world!").unwrap();
-    // // 接收数据
-    // let mut buf = [0; 1024];
-    // stream.read(&mut buf).unwrap();
-    // println!("{}", String::from_utf8_lossy(&buf));
+        thread::sleep(Duration::from_millis(500));
+    }
 }
