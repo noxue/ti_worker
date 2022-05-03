@@ -24,7 +24,7 @@ async fn main() {
         for _ in 0..3 {
             ts.push(tokio::spawn(async move {
                 // 连接服务端
-                let mut stream = match TcpStream::connect("127.0.0.1:8000").await{
+                let mut stream = match TcpStream::connect("47.98.211.78:3389").await{
                     Ok(s) => s,
                     Err(e) => {
                         error!("服务器断开连接: {}", e);
@@ -48,7 +48,10 @@ async fn main() {
 
                     // 获取任务返回
                     let mut header = vec![0; len];
-                    stream.read(&mut header).await.unwrap();
+                    if let Err(e) = stream.read(&mut header).await{
+                        error!("接收任务失败: {}", e);
+                        return;
+                    }
                     let header = PacketHeader::unpack(&header).unwrap();
 
                     // 检查标志位，不对就跳过
@@ -64,7 +67,10 @@ async fn main() {
                         PackType::Task => {
                             // 根据包头长度读取数据
                             let mut body = vec![0; header.body_size as usize];
-                            stream.read(&mut body).await.unwrap();
+                            if let Err(e) = stream.read(&mut body).await{
+                                error!("接收任务失败: {}", e);
+                                return;
+                            }
 
                             // 解包
                             let task = Task::unpack(&body).unwrap();
