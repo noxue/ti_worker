@@ -1,3 +1,5 @@
+use std::env;
+
 use log::{debug, error, info};
 use rand::Rng;
 use ti_protocol::{
@@ -14,6 +16,9 @@ use tokio::{
 
 #[tokio::main]
 async fn main() {
+    let args: Vec<String> = env::args().collect();
+    let server = args.get(1).expect("请提供服务器地址和端口");
+
     log4rs::init_file("log.yml", Default::default()).unwrap();
 
     let len: usize = get_header_size();
@@ -22,9 +27,10 @@ async fn main() {
         let mut ts = vec![];
 
         for _ in 0..3 {
+            let server = server.clone();
             ts.push(tokio::spawn(async move {
                 // 连接服务端
-                let mut stream = match TcpStream::connect("47.98.211.78:3389").await{
+                let mut stream = match TcpStream::connect(server).await {
                     Ok(s) => s,
                     Err(e) => {
                         error!("服务器断开连接: {}", e);
@@ -37,18 +43,18 @@ async fn main() {
                     // 获取任务
                     let packet = Packet::new_without_data(PackType::GetTask);
                     let packet = packet.pack().unwrap();
-                    if let Err(e) = stream.write(&packet).await{
+                    if let Err(e) = stream.write(&packet).await {
                         error!("发送任务失败: {}", e);
                         return;
                     }
-                    if let Err(e) = stream.flush().await{
+                    if let Err(e) = stream.flush().await {
                         error!("发送任务失败: {}", e);
                         return;
                     }
 
                     // 获取任务返回
                     let mut header = vec![0; len];
-                    if let Err(e) = stream.read(&mut header).await{
+                    if let Err(e) = stream.read(&mut header).await {
                         error!("接收任务失败: {}", e);
                         return;
                     }
@@ -67,7 +73,7 @@ async fn main() {
                         PackType::Task => {
                             // 根据包头长度读取数据
                             let mut body = vec![0; header.body_size as usize];
-                            if let Err(e) = stream.read(&mut body).await{
+                            if let Err(e) = stream.read(&mut body).await {
                                 error!("接收任务失败: {}", e);
                                 return;
                             }
@@ -115,11 +121,11 @@ async fn main() {
                             let packet = packet.pack().unwrap();
 
                             // 发送
-                            if let Err(e) = stream.write(&packet).await{
+                            if let Err(e) = stream.write(&packet).await {
                                 error!("发送任务失败: {}", e);
                                 return;
                             }
-                            if let Err(e) = stream.flush().await{
+                            if let Err(e) = stream.flush().await {
                                 error!("发送任务失败: {}", e);
                                 return;
                             }
