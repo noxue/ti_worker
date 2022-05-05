@@ -17,7 +17,9 @@ use tokio::{
 #[tokio::main]
 async fn main() {
     let args: Vec<String> = env::args().collect();
-    let server = args.get(1).expect("请提供服务器地址和端口");
+
+    let server_addr = "0.0.0.0:4321".to_string();
+    let server = args.get(1).unwrap_or(&server_addr).clone();
 
     log4rs::init_file("log.yml", Default::default()).unwrap();
 
