@@ -27,11 +27,11 @@ appenders:
         count: 2 # 最大保存压缩文件数
 # 对全局 log 进行配置
 root:
-  level: info
+  level: debug
   appenders:
     - file
     - stdout
 
 loggers:
   ti_worker:
-    level: info
+    level: debug

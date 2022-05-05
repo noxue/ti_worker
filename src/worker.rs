@@ -98,18 +98,18 @@ impl Worker {
             }
         };
 
+        if status.as_u16() == 403 {
+            return Err("403 Forbidden".to_string());
+        }else if status.as_u16() == 204 {
+            return Err("No Content".to_string());
+        }
+        
         let store: Store = match serde_json::from_str(&text) {
             Ok(v) => v,
             Err(e) => {
                 debug!("返回内容:{}\tstatus:{}", text, status.as_u16());
                 debug!("获取{}失败，json解析库存返回的内容出错:{}", product_name, e);
-                return Err(if status.as_u16() == 403 {
-                    "403 Forbidden".to_string()
-                } else if status.as_u16() == 204 {
-                    "No Content".to_string()
-                } else {
-                    e.to_string()
-                });
+                return Err(e.to_string());
             }
         };
 
