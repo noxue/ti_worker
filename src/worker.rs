@@ -42,7 +42,7 @@ impl Worker {
         default_headers.insert("Sec-Fetch-Mode", r#"navigate"#.parse().unwrap());
         default_headers.insert("Sec-Fetch-User", r#"?1"#.parse().unwrap());
         default_headers.insert("Sec-Fetch-Dest", r#"document"#.parse().unwrap());
-        default_headers.insert("Accept-Language", r#"zh"#.parse().unwrap());
+        default_headers.insert("Accept-Language", r#"en"#.parse().unwrap());
         default_headers.insert("Accept-Encoding", r#"gzip, deflate, br"#.parse().unwrap());
 
         default_headers
@@ -103,7 +103,7 @@ impl Worker {
         }else if status.as_u16() == 204 {
             return Err("No Content".to_string());
         }
-        
+
         let store: Store = match serde_json::from_str(&text) {
             Ok(v) => v,
             Err(e) => {
